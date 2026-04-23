@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Cover Letter Generator
 
-## Getting Started
+An AI-powered cover letter generator built with Next.js 15, Tailwind CSS, and the Google Gemini API. Paste a job description and a short bio, and get a tailored cover letter in seconds.
 
-First, run the development server:
+**Live demo:** [ai-cover-letter-generator-sandy.vercel.app](https://ai-cover-letter-generator-sandy.vercel.app/)
+
+## Features
+
+- Tailored cover letters generated from job description + candidate background
+- 4 tone options: Professional, Friendly, Enthusiastic, Concise & Direct
+- Multi-model fallback chain (2.5-flash → 2.5-flash-lite → 2.0-flash → 2.0-flash-lite) for reliability when upstream models are unavailable
+- One-click copy to clipboard
+- Responsive UI built with Tailwind CSS
+- Serverless deployment on Vercel
+
+## Tech Stack
+
+- **Framework:** Next.js 15 (App Router)
+- **Language:** TypeScript
+- **Styling:** Tailwind CSS
+- **AI:** Google Gemini API (@google/generative-ai)
+- **Deployment:** Vercel
+- **Development:** Claude Code + Cursor (AI-assisted)
+
+## How It Works
+
+1. User pastes a job description and a short resume / background summary
+2. User selects the desired tone
+3. Frontend sends a POST request to `/api/generate`
+4. API route builds a structured prompt (with XML tags for clarity) and calls Gemini
+5. If the primary model is rate-limited or unavailable, the fallback chain automatically tries the next model
+6. The generated cover letter is returned and displayed in the UI
+
+## Running Locally
 
 ```bash
+# Clone the repo
+git clone https://github.com/cbdan030-dev/ai-cover-letter-generator.git
+cd ai-cover-letter-generator
+
+# Install dependencies
+npm install
+
+# Add your Gemini API key
+echo "GEMINI_API_KEY=your_key_here" > .env.local
+
+# Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Get a free Gemini API key at [aistudio.google.com](https://aistudio.google.com).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Prompt Engineering Notes
 
-## Learn More
+The prompt uses a few techniques from the Anthropic prompt engineering toolkit:
 
-To learn more about Next.js, take a look at the following resources:
+- **XML structuring** — `<job_description>`, `<candidate_background>`, `<tone>`, `<instructions>` tags separate the different parts of the prompt cleanly
+- **Clear role** — "You are an expert career coach..."
+- **Explicit constraints** — length, opening hook, forbidden clichés, no placeholder text
+- **Output control** — "Return ONLY the cover letter text, no preamble, no markdown"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture Decisions
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Fallback chain over single-model calls.** LLM APIs go down, get rate-limited, or deprecate models without notice. A fallback chain turns a brittle single-point-of-failure into graceful degradation.
+- **Server-side API key.** The Gemini key lives in a server environment variable; the browser never sees it.
+- **Stateless API.** No database, no auth — simpler to reason about, cheaper to run, easy to port.
 
-## Deploy on Vercel
+## Roadmap
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- [ ] Streaming responses (word-by-word output like Claude.ai)
+- [ ] Save & edit generated letters
+- [ ] Multi-language support (Romanian, Russian, others)
+- [ ] Automated evals on a test suite of 30+ job/resume pairs
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Author
+
+**Dan Ceban** — Full-Stack Vibe Coder  
+[GitHub](https://github.com/cbdan030-dev) · Chișinău, Moldova
+
+Built as a portfolio project to demonstrate AI-assisted full-stack development. Certified across the Anthropic Academy developer track.
+
+## License
+
+MIT
