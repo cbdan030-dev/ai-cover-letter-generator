@@ -12,9 +12,9 @@ const genAI = new GoogleGenerativeAI(apiKey || '');
 // Fallback chain: try models in order for 99.9% uptime
 const MODELS_TO_TRY = [
   'gemini-2.5-flash',
-  'gemini-2.0-flash-exp',
-  'gemini-1.5-flash',
-  'gemini-1.5-flash-latest',
+  'gemini-2.5-flash-lite',
+  'gemini-2.0-flash',
+  'gemini-2.0-flash-lite',
 ];
 
 export async function POST(req: Request) {
